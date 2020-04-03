@@ -63,6 +63,7 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
                 }
             })
         searchSuggestionsViewModel.getErrorOrFailMessage().observe(this, Observer { t ->
+            hideProgressBar()
             AppUtils.showToastMessage(this, t.toString())
         })
     }
@@ -80,9 +81,15 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
         showProgressBar()
-        searchSuggestionsViewModel.onEditTextInputStateChanged(SearchQuery(s.toString(), selectedCity))
+        searchSuggestionsViewModel.onEditTextInputStateChanged(
+            SearchQuery(
+                s.toString(),
+                selectedCity
+            )
+        )
 
     }
+
     private fun hideProgressBar() {
         if (null != progressBar && progressBar.isVisible) {
             progressBar.visibility = View.GONE
