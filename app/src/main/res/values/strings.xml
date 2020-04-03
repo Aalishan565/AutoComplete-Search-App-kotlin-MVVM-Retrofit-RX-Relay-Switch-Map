@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Search Add App</string>
+
+    <string-array name="array_cities">
+        <item>Bangalore</item>
+        <item>Gurgaon</item>
+        <item>Delhi</item>
+        <item>Pune</item>
+    </string-array>
+
+</resources>
