@@ -10,9 +10,9 @@ class SearchSuggestionsAdapter(context: Context, resource: Int) :
     private val hintArrayList = arrayListOf<String>()
 
     fun setData(list: List<String>?) {
-        hintArrayList?.clear()
+        hintArrayList.clear()
         if (list != null) {
-            hintArrayList?.addAll(list)
+            hintArrayList.addAll(list)
         }
     }
 

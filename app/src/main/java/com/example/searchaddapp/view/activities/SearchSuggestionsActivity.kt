@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.searchaddapp.R
 import com.example.searchaddapp.apputils.AppUtils
 import com.example.searchaddapp.view.adapters.SearchSuggestionsAdapter
+import com.example.searchaddapp.view.dto.SearchQuery
 import com.example.searchaddapp.viewmodel.SearchSuggestionsViewModel
 import kotlinx.android.synthetic.main.activity_search.*
 
@@ -21,12 +22,13 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
     private lateinit var selectedCity: String
     private lateinit var searchSuggestionsViewModel: SearchSuggestionsViewModel
     private lateinit var adapter: SearchSuggestionsAdapter
-    var addressList = arrayListOf<String>()
+    private var addressList = arrayListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        searchSuggestionsViewModel = ViewModelProvider(this).get(SearchSuggestionsViewModel::class.java)
+        searchSuggestionsViewModel =
+            ViewModelProvider(this).get(SearchSuggestionsViewModel::class.java)
         adapter = SearchSuggestionsAdapter(
             this, android.R.layout.simple_dropdown_item_1line
         )
@@ -35,6 +37,7 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
         actvQueary.onItemClickListener = this
         actvQueary.addTextChangedListener(this)
         spinnerCities.onItemSelectedListener = this
+        observeData()
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -44,13 +47,13 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
         selectedCity = parent?.getItemAtPosition(position).toString()
     }
 
-    private fun loadData(queryString: String, city: String) {
-        searchSuggestionsViewModel.getSuggestionsList(queryString, city).observe(
+    private fun observeData() {
+        searchSuggestionsViewModel.getSuggestionsList().observe(
             this,
             Observer { t ->
                 if (t.isNotEmpty()) {
                     addressList.clear()
-                    for ((index, value) in t.withIndex()) {
+                    for ((index) in t.withIndex()) {
                         addressList.add(t[index].addressString)
                     }
                     adapter.setData(addressList)
@@ -64,7 +67,7 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         AppUtils.hideKeyboard(this, view)
-        AppUtils.showToastMessage(this, "selected ${addressList[position]}")
+        AppUtils.showToastMessage(this, addressList[position])
     }
 
     override fun afterTextChanged(s: Editable?) {
@@ -74,7 +77,10 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        loadData(s.toString(), selectedCity)
+        searchSuggestionsViewModel.onEditTextInputStateChanged(
+            SearchQuery(s.toString(), selectedCity)
+        )
+
     }
 
 }

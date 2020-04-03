@@ -5,13 +5,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.searchaddapp.gateway.CommunicationManager
 import com.example.searchaddapp.model.datamodel.Address
-import com.example.searchaddapp.model.datamodel.SearchResponse
-import io.reactivex.Observer
+import com.example.searchaddapp.view.dto.SearchQuery
+import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class SearchSuggestionsRepository(private val context: Context) {
+
+    private val autoCompletePublishSubject = PublishRelay.create<SearchQuery>()
 
     private var hintSuccessMutableList: MutableLiveData<List<Address>> = MutableLiveData()
 
@@ -21,35 +23,29 @@ class SearchSuggestionsRepository(private val context: Context) {
         return hintFailMessage
     }
 
-    fun callSearchSuggestionsFromApi(queryString: String, city: String): LiveData<List<Address>> {
-        CommunicationManager.getSearchResponseImplMethod(context, queryString, city)!!
+    fun callSearchSuggestionsFromApi(): LiveData<List<Address>> {
+        autoCompletePublishSubject
+            .debounce(300, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .switchMap {
+                CommunicationManager.getSearchResponseImplMethod(
+                    context,
+                    it.query,
+                    it.city
+                )!!
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).apply {
-                subscribe(object :
-                    Observer<SearchResponse> {
-
-                    override fun onSubscribe(d: Disposable) {
-                    }
-
-                    override fun onNext(response: SearchResponse) {
-                        if (response.data.addressList.isNotEmpty()) {
-                            hintSuccessMutableList.postValue(response.data.addressList)
-                        }
-                    }
-
-                    override fun onError(e: Throwable) {
-                        if (e != null) {
-                            hintFailMessage.postValue(e.message)
-                        }
-                    }
-
-                    override fun onComplete() {
-
-                    }
-                })
+                subscribe({ result ->
+                    hintSuccessMutableList.postValue(result.data.addressList)
+                }, { t: Throwable? -> hintFailMessage.value = t.toString() })
             }
 
         return hintSuccessMutableList
+    }
+
+    fun onEditTextInputStateChanged(searchQuery: SearchQuery) {
+        autoCompletePublishSubject.accept(searchQuery)
     }
 
 }

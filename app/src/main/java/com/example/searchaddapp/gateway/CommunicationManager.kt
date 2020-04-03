@@ -26,7 +26,7 @@ class CommunicationManager {
                         .cache(Cache(context.cacheDir, 5 * 1024 * 1024))
                         .addInterceptor { chain ->
                             var request = chain.request()
-                            request = if (AppUtils.isNetworkAvailable(context)!!)
+                            request = if (AppUtils.isNetworkAvailable(context))
                                 request.newBuilder().header("Cache-Control", "public, max-age=" + 5)
                                     .build()
                             else

@@ -23,14 +23,6 @@ class AppUtils {
             Toast.makeText(context, message, duration).show()
         }
 
-        fun showToastMessageById(
-            context: Context,
-            id: Int,
-            duration: Int = Toast.LENGTH_SHORT
-        ) {
-            Toast.makeText(context, context.getString(id), duration).show()
-        }
-
 
         fun hideKeyboard(
             mContext: Context,

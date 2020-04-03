@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Select the City"
+        android:text="@string/select_the_city"
         app:layout_constraintBottom_toBottomOf="@+id/spinnerCities"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,7 +35,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="end"
-        android:hint="Start typing"
+        android:hint="@string/start_typing"
         android:maxLines="2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
