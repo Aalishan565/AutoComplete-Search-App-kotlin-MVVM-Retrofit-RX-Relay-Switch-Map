@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.searchaddapp.R
@@ -58,6 +59,7 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
                     }
                     adapter.setData(addressList)
                     adapter.notifyDataSetChanged()
+                    hideProgressBar()
                 }
             })
         searchSuggestionsViewModel.getErrorOrFailMessage().observe(this, Observer { t ->
@@ -77,11 +79,18 @@ class SearchSuggestionsActivity : AppCompatActivity(), AdapterView.OnItemSelecte
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        searchSuggestionsViewModel.onEditTextInputStateChanged(
-            SearchQuery(s.toString(), selectedCity)
-        )
+        showProgressBar()
+        searchSuggestionsViewModel.onEditTextInputStateChanged(SearchQuery(s.toString(), selectedCity))
 
     }
+    private fun hideProgressBar() {
+        if (null != progressBar && progressBar.isVisible) {
+            progressBar.visibility = View.GONE
+        }
+    }
 
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+    }
 }
 
